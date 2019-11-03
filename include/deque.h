@@ -12,8 +12,6 @@
 
 
 namespace rjqiao {
-    using std::allocator;
-    using std::allocator_traits;
 
     template<class T, class Alloc = allocator<T> >
     struct deque {
@@ -24,9 +22,11 @@ namespace rjqiao {
         using reference = value_type &;
         using const_reference = const value_type &;
         using pointer = typename allocator_traits<allocator_type>::pointer;
+        using const_pointer = typename allocator_traits<allocator_type>::pointer;
+
+        using iterator = deque_iterator;
         using size_type = std::size_t;
         using difference_type = std::ptrdiff_t;
-        using iterator = deque_iterator;
 
         struct deque_iterator {
             using difference_type = deque::difference_type;
@@ -63,7 +63,8 @@ namespace rjqiao {
             bool operator>=(const deque_iterator &) const; //optional
 
             auto operator++() -> deque_iterator & {
-                return deque_iterator(dll_ptr->next);
+                dll_ptr = dll_ptr->next;
+                return *this;
             }
 
             deque_iterator operator++(int); //optional
@@ -80,7 +81,8 @@ namespace rjqiao {
                 return deque_iterator(p);
             }
 
-            friend auto operator+(size_type num, const deque_iterator &it) -> deque_iterator {
+            friend auto operator+(size_type num, const deque_iterator &it)
+            -> deque_iterator {
                 return it + num;
             }
 
@@ -102,10 +104,12 @@ namespace rjqiao {
             }
         };
 
-        // ---------------------------------
+        // ---------------------- members ----------------------=
 
         doubly_linked_node_t<value_type> *_head = nullptr, *_tail = nullptr;
         size_type _size = 0;
+
+        // ---------------------- methods -----------------------
 
         deque() = default;
 
@@ -125,12 +129,12 @@ namespace rjqiao {
         template<class InputIterator>
         deque(InputIterator first, InputIterator last,
               const allocator_type &alloc = allocator_type()) {
-
+            for (InputIterator curr = first; curr != last; ++curr) {
+                push_back(*curr);
+            }
         }
 
-        deque(const deque &other) {
-
-        }
+        deque(const deque &other) : deque<iterator>(other.begin(), other.end()) {}
 
         deque(deque &&other) noexcept = delete;
 
@@ -273,11 +277,11 @@ namespace rjqiao {
 
     };
 
-    template<class T, class Alloc = allocator<T> >
-    auto operator+(
-            typename deque<T, Alloc>::size_type num,
-            const typename deque<T, Alloc>::deque_iterator &it)
-    -> typename deque<T, Alloc>::deque_iterator {
-        return it + num;
-    }
+//    template<class T, class Alloc = allocator<T> >
+//    auto operator+(
+//            typename deque<T, Alloc>::size_type num,
+//            const typename deque<T, Alloc>::deque_iterator &it)
+//    -> typename deque<T, Alloc>::deque_iterator {
+//        return it + num;
+//    }
 }

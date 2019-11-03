@@ -8,6 +8,11 @@
 #include <memory>
 
 namespace rjqiao {
+
+    using std::allocator;
+    using std::allocator_traits;
+
+
     template<typename T>
     struct node_t {
         T value;
@@ -47,6 +52,8 @@ namespace rjqiao {
                 : val(val), prev(prev), next(succ) {}
 
         ~doubly_linked_node_t() = default;
+
+
     };
 
 }
