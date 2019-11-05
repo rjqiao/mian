@@ -9,19 +9,19 @@
 #include <iterator>
 
 namespace rjqiao {
-    template<class Category,
-            class T,
-            class Distance=std::ptrdiff_t,
-            class Pointer=T *,
-            class Reference = T &
-    >
-    struct iterator {
-        typedef T value_type;
-        typedef Distance difference_type;
-        typedef Pointer pointer;
-        typedef Reference reference;
-        typedef Category iterator_category;
-    };
+//    template<class Category,
+//            class T,
+//            class Distance=std::ptrdiff_t,
+//            class Pointer=T *,
+//            class Reference = T &
+//    >
+//    struct iterator {
+//        typedef T value_type;
+//        typedef Distance difference_type;
+//        typedef Pointer pointer;
+//        typedef Reference reference;
+//        typedef Category iterator_category;
+//    };
 
     using std::input_iterator_tag;
     using std::output_iterator_tag;

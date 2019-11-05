@@ -77,9 +77,11 @@ TEST(DequeTest1, DEQUE_CONSTRUCTOR) {
     ASSERT_EQ(dq2.size(), 0);
     ASSERT_EQ(dq2._head, nullptr);
     ASSERT_EQ(dq2.begin().dll_ptr, nullptr);
+    auto dq_2_5 = dq2;
 
-    auto dq3 = dq2;
-    dq2[0] = 999; //?? why not used
-    ASSERT_EQ(dq3[0], 5);
-    ASSERT_EQ(dq2[0], 999);
+    auto dq_3 = dq;
+    auto dq_4 = dq_3;
+    dq_3[0] = 999;
+    ASSERT_EQ(dq_4[0], 5);
+    ASSERT_EQ(dq_3[0], 999);
 }
