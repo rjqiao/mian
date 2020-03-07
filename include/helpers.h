@@ -5,6 +5,7 @@
 #ifndef DATA_STRUCTURES_HELPERS_H
 #define DATA_STRUCTURES_HELPERS_H
 
+#include <string_view>
 
 template<class T>
 constexpr

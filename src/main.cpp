@@ -47,7 +47,7 @@ int main2() {
 
     it_A a(nullptr);
 
-    rjqiao::operator+<A>(rjqiao::deque<A>::size_type(1), a);
+//    rjqiao::operator+<A>(rjqiao::deque<A>::size_type(1), a);
     return 0;
 }
 

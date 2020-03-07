@@ -31,6 +31,11 @@
 *.out
 *.app
 
-build/
 .idea/
-lib/
+/lib/
+/bin/
+
+/build
+/build-debug
+/build-release
+/cmake-build-debug
