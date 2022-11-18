@@ -12,10 +12,86 @@
 
 
 namespace rjqiao {
-    using std::allocator;
-    using std::allocator_traits;
 
-    template<class T, class Alloc = allocator<T> >
+    template<class T, class Ref, class Ptr>
+    struct _Deque_iterator {
+        using value_type = T;
+        using pointer = Ptr;
+        using reference = Ref;
+        using size_type = size_t;
+        using difference_type = std::ptrdiff_t;
+        using iterator_category = random_access_iterator_tag;
+
+        doubly_linked_node_t<T> *dll_ptr;
+
+        explicit _Deque_iterator(doubly_linked_node_t<T> *dll_ptr) : dll_ptr(dll_ptr) {}
+
+        _Deque_iterator(const _Deque_iterator &other) : dll_ptr(other.dll_ptr) {}
+
+        ~_Deque_iterator() = default;
+
+        auto operator=(const _Deque_iterator &other) -> _Deque_iterator & {
+            auto temp = _Deque_iterator(other);
+            *this = std::move(other);
+            return *this;
+        }
+
+        auto operator==(const _Deque_iterator &other) const -> bool {
+            return dll_ptr == other.dll_ptr;  //
+        }
+
+        auto operator!=(const _Deque_iterator &other) const -> bool {
+            return !(*this == other);
+        }
+
+        bool operator<(const _Deque_iterator &) const; //optional
+        bool operator>(const _Deque_iterator &) const; //optional
+        bool operator<=(const _Deque_iterator &) const; //optional
+        bool operator>=(const _Deque_iterator &) const; //optional
+
+        auto operator++() -> _Deque_iterator & {
+            dll_ptr = dll_ptr->next;
+            return *this;
+        }
+
+        _Deque_iterator operator++(int); //optional
+        _Deque_iterator &operator--(); //optional
+        _Deque_iterator operator--(int); //optional
+        _Deque_iterator &operator+=(size_type); //optional
+
+        _Deque_iterator operator+(size_type num) const {
+            doubly_linked_node_t<T> *p = dll_ptr;
+            while (p != nullptr && num > 0) {
+                p = p->next;
+                num--;
+            }
+            return _Deque_iterator(p);
+        }
+
+        friend auto operator+(size_type num, const _Deque_iterator &it)
+        -> _Deque_iterator {
+            return it + num;
+        }
+
+        _Deque_iterator &operator-=(size_type); //optional
+        _Deque_iterator operator-(size_type) const; //optional
+        difference_type operator-(_Deque_iterator) const; //optional
+
+
+        auto operator*() const -> reference {
+            return dll_ptr->val;
+        }
+
+        auto operator->() const -> pointer {
+            return dll_ptr->next;
+        }
+
+        auto operator[](size_type num) const -> reference {
+            return *(this + num);
+        }
+    };
+
+    template<class T, class Alloc = allocator<T>>
     struct deque {
         struct deque_iterator;
 
@@ -24,88 +100,19 @@ namespace rjqiao {
         using reference = value_type &;
         using const_reference = const value_type &;
         using pointer = typename allocator_traits<allocator_type>::pointer;
+        using const_pointer = typename allocator_traits<allocator_type>::const_pointer;
+
+        using iterator = _Deque_iterator<value_type, reference, pointer>;
+        using const_iterator = _Deque_iterator<value_type, const_reference, const_pointer>;
         using size_type = std::size_t;
         using difference_type = std::ptrdiff_t;
-        using iterator = deque_iterator;
 
-        struct deque_iterator {
-            using difference_type = deque::difference_type;
-            using value_type = deque::value_type;
-            using pointer = deque::pointer;
-            using reference = deque::reference;
-            using iterator_category = random_access_iterator_tag;
-
-            doubly_linked_node_t<T> *dll_ptr;
-
-            explicit deque_iterator(doubly_linked_node_t<T> *dll_ptr) : dll_ptr(dll_ptr) {}
-
-            deque_iterator(const deque_iterator &other) : dll_ptr(other.dll_ptr) {}
-
-            ~deque_iterator() = default;
-
-            auto operator=(const deque_iterator &other) -> deque_iterator & {
-                auto temp = deque_iterator(other);
-                *this = std::move(other);
-                return *this;
-            }
-
-            auto operator==(const deque_iterator &other) const -> bool {
-                return dll_ptr == other.dll_ptr;  //
-            }
-
-            auto operator!=(const deque_iterator &other) const -> bool {
-                return !(*this == other);
-            }
-
-            bool operator<(const deque_iterator &) const; //optional
-            bool operator>(const deque_iterator &) const; //optional
-            bool operator<=(const deque_iterator &) const; //optional
-            bool operator>=(const deque_iterator &) const; //optional
-
-            auto operator++() -> deque_iterator & {
-                return deque_iterator(dll_ptr->next);
-            }
-
-            deque_iterator operator++(int); //optional
-            deque_iterator &operator--(); //optional
-            deque_iterator operator--(int); //optional
-            deque_iterator &operator+=(size_type); //optional
-
-            deque_iterator operator+(size_type num) const {
-                doubly_linked_node_t<T> *p = dll_ptr;
-                while (p != nullptr && num > 0) {
-                    p = p->next;
-                    num--;
-                }
-                return deque_iterator(p);
-            }
-
-            friend auto operator+(size_type num, const deque_iterator &it) -> deque_iterator {
-                return it + num;
-            }
-
-            deque_iterator &operator-=(size_type); //optional
-            deque_iterator operator-(size_type) const; //optional
-            difference_type operator-(deque_iterator) const; //optional
-
-
-            auto operator*() const -> reference {
-                return dll_ptr->val;
-            }
-
-            auto operator->() const -> pointer {
-                return dll_ptr->next;
-            }
-
-            auto operator[](size_type num) const -> reference {
-                return *(this + num);
-            }
-        };
-
-        // ---------------------------------
+        // ---------------------- members ----------------------=
 
         doubly_linked_node_t<value_type> *_head = nullptr, *_tail = nullptr;
         size_type _size = 0;
+
+        // ---------------------- methods -----------------------
 
         deque() = default;
 
@@ -125,12 +132,12 @@ namespace rjqiao {
         template<class InputIterator>
         deque(InputIterator first, InputIterator last,
               const allocator_type &alloc = allocator_type()) {
-
+            for (InputIterator curr = first; curr != last; ++curr) {
+                push_back(*curr);
+            }
         }
 
-        deque(const deque &other) {
-
-        }
+        deque(const deque &other) : deque(other.begin(), other.end()) {}
 
         deque(deque &&other) noexcept = delete;
 
@@ -262,22 +269,22 @@ namespace rjqiao {
             return res;
         }
 
-        iterator begin() noexcept {
+        iterator begin() const noexcept {
             return iterator(_head);
         }
 
-        iterator end() noexcept {
+        iterator end() const noexcept {
             return iterator(nullptr);
         }
 
 
     };
 
-    template<class T, class Alloc = allocator<T> >
-    auto operator+(
-            typename deque<T, Alloc>::size_type num,
-            const typename deque<T, Alloc>::deque_iterator &it)
-    -> typename deque<T, Alloc>::deque_iterator {
-        return it + num;
-    }
+//    template<class T, class Alloc = allocator<T> >
+//    auto operator+(
+//            typename deque<T, Alloc>::size_type num,
+//            const typename deque<T, Alloc>::deque_iterator &it)
+//    -> typename deque<T, Alloc>::deque_iterator {
+//        return it + num;
+//    }
 }

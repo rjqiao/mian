@@ -5,9 +5,18 @@
 #include <deque>
 #include <iostream>
 #include <string>
+#include <mutex>
 
-#include "deque.h"
-#include "helpers.h"
+#include "base/deque.h"
+#include "base/helpers.h"
+// #include "thread_pool.h"
+#include "base/concurrent_hash_map.h"
+#include "base/concurrent_weak_map.h"
+#include "base/spin_lock.h"
+#include "base/read_write_spin_lock.h"
+#include "base/lock_utils.h"
+
+#include <atomic>
 
 using std::cout;
 using std::endl;
@@ -27,6 +36,7 @@ struct B {
 
 
 int main2() {
+//    std::atomic_fetch_add()
     rjqiao::deque<int> dq_rjqiao;
 
     std::deque<int> dq_std;
@@ -47,10 +57,12 @@ int main2() {
 
     it_A a(nullptr);
 
-    rjqiao::operator+<A>(rjqiao::deque<A>::size_type(1), a);
+//    rjqiao::operator+<A>(rjqiao::deque<A>::size_type(1), a);
+    return 0;
 }
 
 int main() {
     std::deque<A> dq_std;
+    cout<<"asdfasdfad\n";
 //    rjqiao::deque<A> dq_rjqiao(1);
 }
